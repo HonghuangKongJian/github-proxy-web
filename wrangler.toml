@@ -14,6 +14,7 @@ LINK_TTL = "7200"    # 生成的链接有效期（秒），默认 2 小时
 POW_DIFF = "4"       # 工作量证明难度，0 关闭；调大则生成变慢、防刷更强
 RL_SIGN = "20"       # 单个 IP 每分钟最多签发多少条链接，0 不限
 RL_PROXY = "300"     # 单个 IP 每分钟最多发起多少次代理请求，0 不限
+PORTAL_URL = "https://amw3.eu.org/"  # 门户地址；设为 "-" 可隐藏「返回门户」按钮
 
 # PROXY_SECRET 属于密钥，不要写在这里：
 #   npx wrangler secret put PROXY_SECRET

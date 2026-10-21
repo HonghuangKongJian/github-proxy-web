@@ -18,6 +18,19 @@
     -webkit-font-smoothing:antialiased;
   }
   .wrap{max-width:760px; margin:0 auto; padding:48px 20px 72px}
+  .nav{display:flex; align-items:center; margin-bottom:20px}
+  .nav .portal-btn{
+    display:inline-flex; align-items:center;
+    padding:3px 12px; font-size:13px; font-weight:600;
+    border:1px solid var(--brand); border-radius:999px;
+    color:var(--brand); text-decoration:none;
+    transition:background .15s, color .15s;
+  }
+  .nav .portal-btn:hover{background:var(--brand); color:#fff}
+  .nav .portal-btn.hidden{display:none}
+  @media (max-width:420px){
+    .nav .portal-btn{padding:3px 9px; font-size:12px}
+  }
   h1{font-size:24px; font-weight:600; margin:0 0 8px; letter-spacing:-.01em}
   .lead{color:var(--text-2); margin:0 0 32px; font-size:15px}
   .card{
@@ -75,6 +88,8 @@
   }
   pre code{background:none; border:none; padding:0; font-size:12.5px; line-height:1.7}
   footer{color:var(--text-3); font-size:12.5px; margin-top:32px; text-align:center}
+  footer a{color:var(--brand); text-decoration:none}
+  footer a:hover{text-decoration:underline}
   .spin{
     display:inline-block; width:13px; height:13px; vertical-align:-2px; margin-right:6px;
     border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%;
@@ -85,6 +100,10 @@
 </head>
 <body>
 <div class="wrap">
+  <nav class="nav">
+    <a href="https://amw3.eu.org/" id="portalLink" class="portal-btn" title="返回门户首页">← 返回门户</a>
+  </nav>
+
   <h1>GitHub 加速下载</h1>
   <p class="lead">粘贴 GitHub 链接，生成一条带签名的高速通道。链接含随机校验码，无法批量伪造。</p>
 
@@ -130,11 +149,36 @@
     </ul>
   </div>
 
-  <footer>仅用于加速公开代码资源的访问</footer>
+  <footer>
+    仅用于加速公开代码资源的访问 ·
+    <a href="https://amw3.eu.org/" id="portalLinkFooter">返回门户</a>
+  </footer>
 </div>
 
 <script>
 var DIFF = 4;
+var PORTAL_URL = "https://amw3.eu.org/";
+
+function applyPortalConfig() {
+  var url = String(PORTAL_URL || '').trim();
+  var nav = document.getElementById('portalLink');
+  var foot = document.getElementById('portalLinkFooter');
+  if (!url || url === '-') {
+    if (nav) nav.classList.add('hidden');
+    if (foot) foot.style.display = 'none';
+    return;
+  }
+  if (nav) {
+    nav.href = url;
+    nav.classList.remove('hidden');
+  }
+  if (foot) {
+    foot.href = url;
+    foot.style.display = '';
+  }
+}
+applyPortalConfig();
+
 var srcEl = document.getElementById('src');
 var errEl = document.getElementById('err');
 var genBtn = document.getElementById('gen');

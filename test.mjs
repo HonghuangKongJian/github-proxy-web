@@ -59,8 +59,9 @@ async function sha256hex(str) {
 
 async function mine(url, diff) {
   const need = '0'.repeat(diff);
-  for (let i = 0; i < 5000000; i++) {
-    if ((await sha256hex(url + '|' + i)).startsWith(need)) return String(i);
+  for (let i = 0; i < 2000000; i++) {
+    const h = await sha256hex(url + '|' + i);
+    if (h.startsWith(need)) return String(i);
   }
   throw new Error('mine failed');
 }
@@ -78,7 +79,14 @@ async function issue(url, diff = 2) {
 console.log('\n[1] 网页与签发');
 {
   const res = await call('/');
-  check('GET / 返回网页', res.status === 200 && (await res.text()).includes('GitHub 加速下载'));
+  const pageText = await res.text();
+  check('GET / 返回网页', res.status === 200 && pageText.includes('GitHub 加速下载'));
+  check('GET / 包含返回门户导航链接', pageText.includes('id="portalLink"') && pageText.includes('https://amw3.eu.org/'));
+  check('GET / 包含页脚返回门户链接', pageText.includes('id="portalLinkFooter"'));
+
+  const customRes = await worker.fetch(new Request(ORIGIN + '/'), { ...env, PORTAL_URL: 'https://custom.portal.com/' }, {});
+  const customPageText = await customRes.text();
+  check('自定义 PORTAL_URL 环境变量注入生效', customPageText.includes('var PORTAL_URL = "https://custom.portal.com/";'));
 
   const { status, data } = await issue('https://github.com/facebook/react/archive/refs/heads/main.zip');
   check('签发成功', status === 200 && !!data.link, JSON.stringify(data));

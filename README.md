@@ -2,7 +2,7 @@
 
 带网页界面的 GitHub 代理，生成的每条链接都含服务端签名的随机码，防止被人当公共代理批量刷。
 
-> **线上站点**：https://gh.amw3.eu.org　|　**仓库**：https://github.com/HonghuangKongJian/github-proxy-web
+> **线上站点**：[https://gh.amw3.eu.org](https://gh.amw3.eu.org) | **洪荒空间门户**：[https://amw3.eu.org](https://amw3.eu.org) | **仓库**：[https://github.com/HonghuangKongJian/github-proxy-web](https://github.com/HonghuangKongJian/github-proxy-web)
 >
 > Worker 名 `github-proxy-web`，签名密钥已通过 `wrangler secret` 注入（不入库）。
 > 换域名只需改 `wrangler.toml` 里的 `routes`，再跑 `npm run deploy`。
@@ -79,6 +79,7 @@ node build.js
 | `POW_DIFF` | `4` | PoW 难度，即哈希前几位须为 0。每 +1，生成耗时约翻 16 倍 |
 | `RL_SIGN` | `20` | 单 IP 每分钟最多签发多少条链接 |
 | `RL_PROXY` | `300` | 单 IP 每分钟最多多少次代理请求 |
+| `PORTAL_URL` | `https://amw3.eu.org/` | 门户地址；设为 `-` 可隐藏「返回门户」按钮 |
 | `PROXY_SECRET` | — | HMAC 密钥，走 secret 设置，**不要写进配置文件** |
 
 `POW_DIFF` 调到 5 时，中低端手机生成链接要等 5 秒以上，一般保持 4 即可。
@@ -96,7 +97,7 @@ node build.js
 
 ## 自测
 
-改完代码跑一遍，18 项用例覆盖签发、代理、越权拦截、过期、跳转续签、限速：
+改完代码跑一遍，21 项用例覆盖签发、代理、越权拦截、过期、跳转续签、限速：
 
 ```bash
 npm test
@@ -113,7 +114,7 @@ npm test
 | `page.html` | 网页界面，含前端 PoW 计算 |
 | `wrangler.toml` | 部署配置与可调参数 |
 | `build.js` | 把 HTML 内联成单文件，供控制台粘贴部署 |
-| `test.mjs` | 端到端自测，18 项用例 |
+| `test.mjs` | 端到端自测，21 项用例 |
 | `dist/worker.js` | build 产物（控制台部署用） |
 
 ## 日常用法

@@ -59,6 +59,7 @@ export default {
       pow: clamp(Number(env.POW_DIFF) || DEFAULT_POW, 0, 6),
       rlSign: Number(env.RL_SIGN ?? 20),    // 每 IP 每分钟签发次数
       rlProxy: Number(env.RL_PROXY ?? 300), // 每 IP 每分钟代理请求数
+      portalUrl: env.PORTAL_URL ?? 'https://amw3.eu.org/',
     };
 
     if (request.method === 'GET' && url.pathname === '/') return page(cfg);
@@ -72,7 +73,9 @@ export default {
 /* ---------- 网页 ---------- */
 
 function page(cfg) {
-  const html = pageHtml.replace('var DIFF = 4;', 'var DIFF = ' + cfg.pow + ';');
+  const html = pageHtml
+    .replace('var DIFF = 4;', 'var DIFF = ' + cfg.pow + ';')
+    .replace('var PORTAL_URL = "https://amw3.eu.org/";', 'var PORTAL_URL = ' + JSON.stringify(cfg.portalUrl) + ';');
   return new Response(html, {
     headers: {
       'content-type': 'text/html; charset=utf-8',
