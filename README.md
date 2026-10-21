@@ -2,8 +2,9 @@
 
 带网页界面的 GitHub 代理，生成的每条链接都含服务端签名的随机码，防止被人当公共代理批量刷。
 
-> **当前线上地址：https://gh.amw3.eu.org**
-> Worker 名 `github-proxy-web`，签名密钥已通过 `wrangler secret` 注入。
+> **线上站点**：https://gh.amw3.eu.org　|　**仓库**：https://github.com/HonghuangKongJian/github-proxy-web
+>
+> Worker 名 `github-proxy-web`，签名密钥已通过 `wrangler secret` 注入（不入库）。
 > 换域名只需改 `wrangler.toml` 里的 `routes`，再跑 `npm run deploy`。
 
 两个版本，按需取用：
