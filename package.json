@@ -1,0 +1,16 @@
+{
+  "name": "github-proxy-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "GitHub 加速下载站 —— Cloudflare Worker，带签名随机码防滥用",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "build": "node build.js",
+    "test": "node build.js && node test.mjs",
+    "secret": "wrangler secret put PROXY_SECRET"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

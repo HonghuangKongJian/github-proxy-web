@@ -1,0 +1,19 @@
+name = "github-proxy-web"
+main = "worker.js"
+compatibility_date = "2026-01-01"
+
+# 让 Worker 可以直接 import .html 文件（作为纯文本引入）
+# fallthrough = true 表示匹配后继续套用后面的默认规则，消除告警
+rules = [{ type = "Text", globs = ["**/*.html"], fallthrough = true }]
+
+# 部署域名。想换域名改这里再跑一次 npm run deploy 即可
+routes = [{ pattern = "gh.amw3.eu.org", custom_domain = true }]
+
+[vars]
+LINK_TTL = "7200"    # 生成的链接有效期（秒），默认 2 小时
+POW_DIFF = "4"       # 工作量证明难度，0 关闭；调大则生成变慢、防刷更强
+RL_SIGN = "20"       # 单个 IP 每分钟最多签发多少条链接，0 不限
+RL_PROXY = "300"     # 单个 IP 每分钟最多发起多少次代理请求，0 不限
+
+# PROXY_SECRET 属于密钥，不要写在这里：
+#   npx wrangler secret put PROXY_SECRET

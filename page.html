@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GitHub 加速下载</title>
+<style>
+  :root{
+    --bg:#ffffff; --surface:#f7f8fa; --line:#e3e6ea; --line-strong:#c8cdd4;
+    --text:#1b1f24; --text-2:#5c6570; --text-3:#8b949e;
+    --brand:#185FA5; --brand-soft:#e6f1fb; --danger:#a32d2d;
+    --radius:12px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding:48px 20px 72px}
+  h1{font-size:24px; font-weight:600; margin:0 0 8px; letter-spacing:-.01em}
+  .lead{color:var(--text-2); margin:0 0 32px; font-size:15px}
+  .card{
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:var(--radius); padding:20px; margin-bottom:20px;
+  }
+  .field{display:flex; gap:8px; flex-wrap:wrap}
+  input[type=text]{
+    flex:1 1 320px; min-width:0; padding:11px 14px; font-size:14px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    border:1px solid var(--line-strong); border-radius:8px; background:#fff; color:var(--text);
+    outline:none; transition:border-color .12s;
+  }
+  input[type=text]:focus{border-color:var(--brand); box-shadow:0 0 0 3px var(--brand-soft)}
+  button{
+    padding:11px 20px; font-size:14px; font-weight:500; cursor:pointer;
+    border:1px solid var(--brand); border-radius:8px; background:var(--brand); color:#fff;
+    transition:opacity .12s;
+  }
+  button:hover:not(:disabled){opacity:.88}
+  button:disabled{opacity:.5; cursor:default}
+  button.ghost{background:#fff; color:var(--brand)}
+  button.ghost:hover:not(:disabled){background:var(--brand-soft)}
+  .hint{color:var(--text-3); font-size:13px; margin:10px 0 0}
+  .samples{margin:14px 0 0; padding:0; list-style:none; display:flex; flex-wrap:wrap; gap:8px}
+  .samples button{
+    padding:5px 11px; font-size:12.5px; border-radius:20px;
+    border:1px solid var(--line-strong); background:#fff; color:var(--text-2); font-weight:400;
+  }
+  .samples button:hover{background:var(--brand-soft); border-color:var(--brand); color:var(--brand)}
+  .err{color:var(--danger); font-size:13.5px; margin:10px 0 0; display:none}
+  #result{display:none}
+  .out{
+    display:flex; gap:8px; align-items:stretch; margin-bottom:10px;
+  }
+  .out input{
+    flex:1 1 auto; min-width:0; padding:10px 12px; font-size:12.5px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    border:1px solid var(--line); border-radius:8px; background:#fff; color:var(--text);
+  }
+  .meta{color:var(--text-3); font-size:12.5px; margin:0}
+  h2{font-size:15px; font-weight:600; margin:0 0 12px}
+  .doc p{margin:0 0 10px; color:var(--text-2); font-size:14px}
+  .doc ul{margin:0; padding-left:20px; color:var(--text-2); font-size:14px}
+  .doc li{margin-bottom:6px}
+  code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    background:var(--surface); border:1px solid var(--line);
+    padding:1px 5px; border-radius:4px; font-size:12.5px; color:var(--text);
+    word-break:break-all;
+  }
+  pre{
+    background:#fff; border:1px solid var(--line); border-radius:8px;
+    padding:12px 14px; overflow-x:auto; margin:0 0 10px;
+  }
+  pre code{background:none; border:none; padding:0; font-size:12.5px; line-height:1.7}
+  footer{color:var(--text-3); font-size:12.5px; margin-top:32px; text-align:center}
+  .spin{
+    display:inline-block; width:13px; height:13px; vertical-align:-2px; margin-right:6px;
+    border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%;
+    animation:spin .7s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>GitHub 加速下载</h1>
+  <p class="lead">粘贴 GitHub 链接，生成一条带签名的高速通道。链接含随机校验码，无法批量伪造。</p>
+
+  <div class="card">
+    <div class="field">
+      <input type="text" id="src" placeholder="https://github.com/user/repo/releases/download/v1.0/app.zip" spellcheck="false" autocomplete="off">
+      <button id="gen">生成链接</button>
+    </div>
+    <p class="err" id="err"></p>
+    <p class="hint">支持仓库、Release 附件、raw 文件、gist、仓库 zip/tar 包</p>
+    <ul class="samples">
+      <li><button data-u="https://github.com/facebook/react/archive/refs/heads/main.zip">仓库 zip</button></li>
+      <li><button data-u="https://raw.githubusercontent.com/facebook/react/main/README.md">raw 文件</button></li>
+      <li><button data-u="https://github.com/facebook/react">仓库首页</button></li>
+    </ul>
+  </div>
+
+  <div class="card" id="result">
+    <h2>生成成功</h2>
+    <div class="out">
+      <input type="text" id="out" readonly>
+      <button id="copy" class="ghost">复制</button>
+      <button id="open">下载</button>
+    </div>
+    <p class="meta" id="exp"></p>
+  </div>
+
+  <div class="card doc">
+    <h2>命令行也能用</h2>
+    <p>生成后的链接可直接用于 <code>git clone</code>，无需额外配置：</p>
+    <pre><code>git clone https://你的域名/p/xxxxx.xxxxxxxx.xxxxxxxxxxxxxx/https://github.com/user/repo.git</code></pre>
+    <p>想让所有 GitHub 地址自动走这条通道，把生成好的链接前缀写进全局配置：</p>
+    <pre><code>git config --global url."https://你的域名/p/xxxxx.xxxxxxxx.xxxxxxxxxxxxxx/https://github.com/".insteadOf "https://github.com/"</code></pre>
+    <p class="meta">链接过期后重新生成一条即可，原来的链接会失效。</p>
+  </div>
+
+  <div class="card doc">
+    <h2>关于随机码</h2>
+    <ul>
+      <li>每条链接由服务端签名生成，含一次性随机码，无法猜测或批量拼凑。</li>
+      <li>链接有有效期，过期自动作废，历史链接不会被长期盗刷。</li>
+      <li>生成时浏览器会做一次轻量计算（约 1 秒），用于阻挡脚本批量刷取。</li>
+    </ul>
+  </div>
+
+  <footer>仅用于加速公开代码资源的访问</footer>
+</div>
+
+<script>
+var DIFF = 4;
+var srcEl = document.getElementById('src');
+var errEl = document.getElementById('err');
+var genBtn = document.getElementById('gen');
+var resultEl = document.getElementById('result');
+var outEl = document.getElementById('out');
+var expEl = document.getElementById('exp');
+
+document.querySelectorAll('.samples button').forEach(function (b) {
+  b.addEventListener('click', function () { srcEl.value = b.dataset.u; srcEl.focus(); });
+});
+
+function sha256hex(str) {
+  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)).then(function (b) {
+    return Array.from(new Uint8Array(b)).map(function (x) { return x.toString(16).padStart(2, '0'); }).join('');
+  });
+}
+
+async function minePow(url) {
+  var need = '0'.repeat(DIFF);
+  for (var i = 0; i < 3000000; i++) {
+    var h = await sha256hex(url + '|' + i);
+    if (h.startsWith(need)) return String(i);
+  }
+  throw new Error('本地校验失败，请刷新页面重试');
+}
+
+genBtn.addEventListener('click', async function () {
+  var raw = srcEl.value.trim();
+  errEl.style.display = 'none';
+  if (!raw) { return showErr('请先粘贴一个 GitHub 链接'); }
+  var url = raw.replace(/^(https?):\/([^/])/i, '$1://$2');
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url.replace(/^\/+/, '');
+
+  genBtn.disabled = true;
+  genBtn.innerHTML = '<span class="spin"></span>生成中';
+  try {
+    var nonce = await minePow(url);
+    var res = await fetch('/api/sign', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ url: url, nonce: nonce })
+    });
+    var data = await res.json();
+    if (!res.ok) throw new Error(data.error || ('服务端返回 ' + res.status));
+
+    outEl.value = data.link;
+    expEl.textContent = '有效至 ' + new Date(data.exp * 1000).toLocaleString() + '，有效期内可重复使用';
+    resultEl.style.display = 'block';
+    resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } catch (e) {
+    showErr(e.message);
+  } finally {
+    genBtn.disabled = false;
+    genBtn.textContent = '生成链接';
+  }
+});
+
+srcEl.addEventListener('keydown', function (e) { if (e.key === 'Enter') genBtn.click(); });
+
+document.getElementById('copy').addEventListener('click', function () {
+  var b = this;
+  outEl.select();
+  var done = function () { b.textContent = '已复制'; setTimeout(function () { b.textContent = '复制'; }, 1600); };
+  if (navigator.clipboard) { navigator.clipboard.writeText(outEl.value).then(done, fallback); } else { fallback(); }
+  function fallback() { try { document.execCommand('copy'); done(); } catch (e) {} }
+});
+
+document.getElementById('open').addEventListener('click', function () {
+  if (outEl.value) window.open(outEl.value, '_blank', 'noopener');
+});
+
+function showErr(msg) {
+  errEl.textContent = msg;
+  errEl.style.display = 'block';
+}
+</script>
+</body>
+</html>

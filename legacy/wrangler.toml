@@ -1,0 +1,15 @@
+name = "github-proxy"
+main = "worker.js"
+compatibility_date = "2026-01-01"
+
+# 绑定自定义域（二选一）
+# 方式 A：routes，适合整个域名已托管在 Cloudflare
+routes = [
+  { pattern = "gh.example.com", custom_domain = true }
+]
+
+# 方式 B：Workers 自定义域名，适合域名只用于代理
+# workers_dev = false
+
+# [observability]
+# enabled = true
