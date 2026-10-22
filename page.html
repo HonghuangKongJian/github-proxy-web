@@ -90,6 +90,26 @@
   footer{color:var(--text-3); font-size:12.5px; margin-top:32px; text-align:center}
   footer a{color:var(--brand); text-decoration:none}
   footer a:hover{text-decoration:underline}
+  .footer-donate-btn{background:transparent; border:none; cursor:pointer; color:var(--text-3); font-size:inherit; padding:0; transition:color .15s}
+  .footer-donate-btn:hover{color:#f59e0b}
+  .donate-modal{display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,.65); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:16px}
+  .donate-modal.active{display:flex}
+  .donate-card{background:#fff; color:var(--text); border:1px solid var(--line); border-radius:18px; width:100%; max-width:360px; padding:24px; position:relative; text-align:center; box-shadow:0 20px 40px rgba(0,0,0,.25); animation:donateIn .2s ease-out}
+  @keyframes donateIn{from{opacity:0; transform:scale(.95)}to{opacity:1; transform:scale(1)}}
+  .donate-close{position:absolute; top:12px; right:12px; width:30px; height:30px; border-radius:8px; border:none; background:transparent; color:var(--text-3); font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center}
+  .donate-close:hover{background:var(--surface); color:var(--text)}
+  .donate-icon{font-size:28px; margin-bottom:4px}
+  .donate-title{margin:0; font-size:17px; font-weight:700}
+  .donate-desc{font-size:12px; color:var(--text-2); margin:6px 0 16px}
+  .donate-tabs{display:flex; gap:8px; padding:4px; background:var(--surface); border-radius:10px; margin-bottom:14px}
+  .donate-tab-btn{flex:1; padding:7px 10px; border-radius:8px; border:none; cursor:pointer; font-size:12.5px; font-weight:600; color:var(--text-3); background:transparent; transition:all .2s}
+  .donate-tab-btn.active-wx{background:#07c160; color:#fff}
+  .donate-tab-btn.active-ali{background:#1677ff; color:#fff}
+  .donate-qr-box{width:210px; height:210px; margin:0 auto 10px; padding:8px; background:#fff; border-radius:12px; border:1px solid var(--line); box-sizing:border-box}
+  .donate-qr-box img{width:100%; height:100%; object-fit:contain}
+  .donate-tip{font-size:12px; color:var(--text-2); margin:0}
+  .donate-pills{display:flex; gap:6px; justify-content:center; margin-top:14px; font-size:11.5px; color:var(--text-3)}
+  .donate-pills span{padding:4px 8px; background:var(--surface); border-radius:6px}
   .spin{
     display:inline-block; width:13px; height:13px; vertical-align:-2px; margin-right:6px;
     border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%;
@@ -151,9 +171,64 @@
 
   <footer>
     仅用于加速公开代码资源的访问 ·
+    <button onclick="openDonateModal()" class="footer-donate-btn" title="赞赏与支持作者">☕ 赞赏支持</button> ·
     <a href="https://amw3.eu.org/" id="portalLinkFooter">返回门户</a>
   </footer>
 </div>
+
+<!-- 赞赏模态框 -->
+<div id="donateModal" class="donate-modal" onclick="if(event.target===this)closeDonateModal()">
+  <div class="donate-card">
+    <button class="donate-close" onclick="closeDonateModal()">&times;</button>
+    <div class="donate-icon">☕</div>
+    <h3 class="donate-title">赞赏与支持作者</h3>
+    <p class="donate-desc">您的支持是维护免费加速节点与持续迭代的最大动力</p>
+    <div class="donate-tabs">
+      <button id="btnPayWx" class="donate-tab-btn active-wx" onclick="switchDonate('wechat')">🟢 微信支付</button>
+      <button id="btnPayAli" class="donate-tab-btn" onclick="switchDonate('alipay')">🔵 支付宝</button>
+    </div>
+    <div class="donate-qr-box">
+      <img id="donateQrImg" src="https://amw3.eu.org/wechat-reward.png" alt="赞赏收款码" />
+    </div>
+    <p id="donateTip" class="donate-tip">请使用微信「扫一扫」支持作者</p>
+    <div class="donate-pills">
+      <span>☕ 请喝咖啡</span>
+      <span>⚡ 赞助节点</span>
+      <span>🚀 随意心意</span>
+    </div>
+  </div>
+</div>
+
+<script>
+function openDonateModal() {
+  var m = document.getElementById('donateModal');
+  if (m) { m.classList.add('active'); switchDonate('wechat'); }
+}
+function closeDonateModal() {
+  var m = document.getElementById('donateModal');
+  if (m) m.classList.remove('active');
+}
+function switchDonate(t) {
+  var wx = document.getElementById('btnPayWx');
+  var ali = document.getElementById('btnPayAli');
+  var img = document.getElementById('donateQrImg');
+  var tip = document.getElementById('donateTip');
+  if (t === 'wechat') {
+    wx.className = 'donate-tab-btn active-wx';
+    ali.className = 'donate-tab-btn';
+    img.src = 'https://amw3.eu.org/wechat-reward.png';
+    tip.innerText = '请使用微信「扫一扫」支持作者';
+  } else {
+    ali.className = 'donate-tab-btn active-ali';
+    wx.className = 'donate-tab-btn';
+    img.src = 'https://amw3.eu.org/alipay-reward.png';
+    tip.innerText = '请使用支付宝「扫一扫」支持作者';
+  }
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeDonateModal();
+});
+</script>
 
 <script>
 var DIFF = 4;
